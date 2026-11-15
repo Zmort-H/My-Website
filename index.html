@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ZhangJinHao 的日常与留言。">
+  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141511" media="(prefers-color-scheme: dark)">
+  <title>ZJH</title>
+  <link rel="icon" href="assets/touxiang.jpg" type="image/jpeg">
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --card: #fffefa;
+      --text: #1c1e19;
+      --muted: #74766e;
+      --line: #e2dfd6;
+      --green: #3f5d46;
+      --green-dark: #304a37;
+      --body: #4f524b;
+      --mono: Consolas, monospace;
+      --radius: 14px;
+      color-scheme: light dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body { margin: 0; color: var(--text); background: var(--bg); line-height: 1.7; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    h1, h2, p { margin: 0; }
+
+    .site-header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 20px; width: min(100% - 32px, 1000px); height: 64px; margin: 0 auto; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .brand { font-weight: 700; letter-spacing: -0.04em; }
+    .brand span { color: var(--green); }
+    .nav { display: flex; gap: 22px; margin-left: auto; }
+    .nav a { color: var(--muted); font-size: 0.76rem; }
+    .nav a:hover { color: var(--text); }
+
+    .page { width: min(100% - 32px, 760px); margin: 0 auto; }
+    .intro { padding: 70px 0 42px; }
+    .label, .meta, .post-author time, .post-foot, .note time, .char-count { font-family: var(--mono); color: var(--muted); }
+    .label { font-size: 0.56rem; letter-spacing: 0.1em; }
+    .intro h1 { margin-top: 10px; font-size: clamp(2.9rem, 8vw, 4.6rem); line-height: 1.05; letter-spacing: -0.06em; }
+    .intro-text { max-width: 520px; margin-top: 18px; color: var(--muted); font-size: 0.94rem; }
+    .meta { margin-top: 16px; font-size: 0.53rem; }
+
+    .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .section-title h2 { font-size: 1.55rem; letter-spacing: -0.04em; }
+    .section-title span { color: var(--muted); font-size: 0.6rem; }
+    .daily { padding: 36px 0 56px; border-top: 1px solid var(--line); }
+    .posts { display: flex; flex-direction: column; gap: 14px; }
+    .post, .guestbook-card { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+    .post-head { display: flex; align-items: center; gap: 9px; }
+    .avatar { width: 32px; height: 32px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
+    .post-author { display: flex; flex-direction: column; line-height: 1.3; }
+    .post-author strong { font-size: 0.74rem; }
+    .post-author time, .post-foot { font-size: 0.47rem; }
+    .post-text { margin-top: 13px; color: var(--body); font-size: 0.84rem; line-height: 1.85; white-space: pre-line; }
+    .post-image { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: 13px; border-radius: 9px; object-fit: cover; }
+    .post-foot { margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--line); }
+
+    .guestbook { padding: 48px 0 76px; border-top: 1px solid var(--line); }
+    .composer textarea { display: block; width: 100%; min-height: 116px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; outline: 0; color: var(--text); background: var(--bg); font-size: 0.84rem; line-height: 1.7; resize: vertical; }
+    .composer textarea:focus { border-color: var(--green); }
+    .composer-foot { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+    .form-status { flex: 1; min-height: 18px; color: var(--green); font-size: 0.62rem; }
+    .form-status.error { color: #b04f3b; }
+    .char-count { font-size: 0.5rem; }
+    .send { min-height: 36px; padding: 7px 16px; border: 0; border-radius: 8px; color: var(--bg); background: var(--green); font-size: 0.7rem; }
+    .send:hover { background: var(--green-dark); }
+    .send:disabled { opacity: 0.5; cursor: wait; }
+    .note-list { margin-top: 17px; border-top: 1px solid var(--line); }
+    .note { padding: 15px 2px; border-bottom: 1px solid var(--line); }
+    .note:last-child { border-bottom: 0; }
+    .note p { color: var(--body); font-size: 0.8rem; line-height: 1.75; overflow-wrap: anywhere; }
+    .note time { display: block; margin-top: 5px; font-size: 0.47rem; }
+    .empty { padding: 32px 10px; color: var(--muted); font-size: 0.7rem; text-align: center; }
+
+    @media (max-width: 560px) {
+      .site-header, .page { width: calc(100% - 24px); }
+      .nav { gap: 14px; }
+      .intro { padding-top: 48px; }
+      .intro h1 { font-size: 2.9rem; }
+      .daily, .guestbook { padding-bottom: 48px; }
+      .post, .guestbook-card { padding: 15px; }
+      .composer-foot { flex-wrap: wrap; }
+      .form-status { flex-basis: 100%; order: 3; }
+      .char-count { margin-left: auto; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141511;
+        --card: #1b1d18;
+        --text: #f0eee7;
+        --muted: #a2a59b;
+        --line: #30332b;
+        --green: #a9c9a2;
+        --green-dark: #c2dabc;
+        --body: #c7c9c1;
+      }
+    }  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home">Zhang Jin Hao<span>.</span></a>
+    <nav class="nav" aria-label="主导航">
+      <a href="#daily">日常</a>
+      <a href="#guestbook">留言</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="intro" id="home">
+      <p class="label">DAILY NOTES</p>
+      <h1>Welcome!</h1>
+      <p class="intro-text">Hi, I'm Hao!</p>
+      <p class="meta"> · 最近更新于 <span id="latestDate">--</span></p>
+    </section>
+
+    <section class="daily" id="daily">
+      <div class="section-title">
+        <h2>最近日常</h2>
+        <span id="postCount">0 条</span>
+      </div>
+      <div class="posts" id="postList"></div>
+    </section>
+
+    <section class="guestbook" id="guestbook">
+      <div class="section-title">
+        <h2>留言</h2>
+        <span id="noteMeta">公开 · 加载中</span>
+      </div>
+      <div class="guestbook-card">
+        <form class="composer" id="noteForm" novalidate>
+          <textarea id="noteMessage" maxlength="200" placeholder="写点什么吧..." aria-label="留言内容" required></textarea>
+          <div class="composer-foot">
+            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+            <span class="char-count" id="charCount">0 / 200</span>
+            <button class="send" type="submit">发送</button>
+          </div>
+        </form>
+        <div class="note-list" id="noteList" aria-live="polite">
+          <div class="empty">正在加载留言...</div>
+        </div>
+      </div>
+    </section>
+  </main>  <script>
+    /* 日常内容：在数组最前面添加新记录即可 */
+    const POSTS = [
+      {
+        date: "2026-09-25",
+        text: "爱你三千遍",
+        image: "assets/posts/GTX.jpg",
+        location: "广东"
+      }
+    ];
+
+    /* Supabase 公共留言板 */
+    const SUPABASE_URL = "https://qsfmkzphwelnownngzem.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzZm1renBod2Vsbm93bm5nemVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3MzgwNzMsImV4cCI6MjExMDMxNDA3M30.2leh_uVE_bQLdknxbBulvHNe0RWSpbdQ4i-m_KpZQVw";
+    const NOTES_URL = SUPABASE_URL + "/rest/v1/guestbook";
+    const AUTH = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY };
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => "&#" + char.charCodeAt(0) + ";");
+    const fmtDate = (value) => {
+      const date = new Date(value + "T12:00:00");
+      return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" }).replaceAll("/", ".");
+    };
+    const fmtTime = (value) => new Date(value).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+
+    /* 日常列表 */
+    const posts = POSTS.slice().sort((a, b) => b.date.localeCompare(a.date));
+    $("postCount").textContent = posts.length + " 条";
+    $("latestDate").textContent = posts[0] ? fmtDate(posts[0].date) : "--";
+    $("postList").innerHTML = posts.map((post) => `
+      <article class="post">
+        <div class="post-head">
+          <img class="avatar" src="assets/touxiang.jpg" alt="Zmorth">
+          <div class="post-author">
+            <strong>Zmorth</strong>
+            <time datetime="${esc(post.date)}">${esc(fmtDate(post.date))}</time>
+          </div>
+        </div>
+        <p class="post-text">${esc(post.text)}</p>
+        ${post.image ? `<img class="post-image" src="${esc(post.image)}" alt="" loading="lazy">` : ""}
+        <div class="post-foot">${esc(post.location || "广东")}</div>
+      </article>
+    `).join("");
+
+    /* 留言板 */
+    const noteList = $("noteList");
+    const noteMeta = $("noteMeta");
+    const noteForm = $("noteForm");
+    const messageInput = $("noteMessage");
+    const formStatus = $("formStatus");
+    let notes = [];
+
+    const api = async (url, options = {}) => {
+      const response = await fetch(url, {
+        ...options,
+        headers: { ...AUTH, ...options.headers }
+      });
+      if (!response.ok) throw new Error("request failed");
+      return response.json();
+    };
+
+    const getNotes = () => api(NOTES_URL + "?select=message,created_at&order=created_at.desc&limit=50");
+    const addNote = async (message) => (await api(NOTES_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({ message })
+    }))[0];
+
+    const renderNotes = () => {
+      noteList.innerHTML = notes.length
+        ? notes.map((note) => `
+            <article class="note">
+              <p>${esc(note.message)}</p>
+              <time datetime="${esc(note.created_at)}">${esc(fmtTime(note.created_at))}</time>
+            </article>
+          `).join("")
+        : '<div class="empty">还没有留言，来写第一条吧。</div>';
+      noteMeta.textContent = notes.length + " 条 · 所有人可见";
+    };
+
+    const loadNotes = async () => {
+      try {
+        notes = await getNotes();
+        renderNotes();
+      } catch (error) {
+        noteList.innerHTML = '<div class="empty">留言加载失败，请稍后刷新。</div>';
+        noteMeta.textContent = "连接失败";
+      }
+    };
+
+    messageInput.oninput = () => { $("charCount").textContent = messageInput.value.length + " / 200"; };
+
+    noteForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const message = messageInput.value.trim();
+      if (!message) {
+        formStatus.textContent = "留言内容不能为空。";
+        formStatus.classList.add("error");
+        messageInput.focus();
+        return;
+      }
+
+      const button = noteForm.querySelector("button");
+      button.disabled = true;
+      formStatus.classList.remove("error");
+      formStatus.textContent = "正在发布...";
+      try {
+        notes.unshift(await addNote(message.slice(0, 200)));
+        notes = notes.slice(0, 50);
+        renderNotes();
+        noteForm.reset();
+        $("charCount").textContent = "0 / 200";
+        formStatus.textContent = "留言已发布";
+      } catch (error) {
+        formStatus.textContent = "发送失败，请稍后再试。";
+        formStatus.classList.add("error");
+      } finally {
+        button.disabled = false;
+      }
+    };
+
+    loadNotes();
+  </script>
+</body>
+</html>
