@@ -39,7 +39,7 @@ const POSTS = [
 - `date` 使用 `YYYY-MM-DD` 格式
 - `text` 是正文
 - `image` 可以省略
-- 图片放进 `assets/posts/`
+- 图片放进 `assets/posts/`，页面会保持图片原始比例
 
 保存后刷新页面即可看到，提交到 GitHub 后线上会自动更新。
 
